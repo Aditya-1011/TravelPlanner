@@ -1,87 +1,64 @@
-"use client";
+// app/trips/new/page.tsx
+import React from "react";
+import { CreateTrip } from "@/lib/actions/CreateTrip";
 
-import { Card, CardHeader, CardContent } from "@/Component/ui/card";
-import CreateTrip from "@/lib/actions/create-trip";
-import { useTransition } from "react";
+type Props = {
+  searchParams?: { error?: string; created?: string };
+};
 
-export default function NewTripPage() {
-    const [pending,starttrsnition]=useTransition();
+export default function NewTripPage({ searchParams }: Props) {
+  const error = searchParams?.error ? decodeURIComponent(searchParams.error) : null;
+  const created = searchParams?.created;
+
   return (
-    <div className="max-w-lg mx-auto mt-10">
-      <Card>
-        <CardHeader>
-          <h2 className="text-xl font-semibold">Create New Trip</h2>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-6" action={(formData:FormData)=>{
-            starttrsnition(()=>{
-                CreateTrip(formData);
-            });
-            
-          }}>
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Title
-              </label>
-              <input
-                type="text"
-                name="title"
-                placeholder="Japan trip..."
-                className="w-full border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+    <main className="max-w-lg mx-auto mt-10 p-4">
+      <h1 className="text-2xl font-semibold mb-4">Create a new trip</h1>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                name="desc"
-                rows={4}
-                placeholder="Trip Description..."
-                className="w-full border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-            </div>
+      {error ? (
+        <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-100 rounded">
+          {error}
+        </div>
+      ) : null}
 
-            {/* Dates (side by side) */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
+      {created ? (
+        <div className="mb-4 p-3 bg-green-50 text-green-700 border border-green-100 rounded">
+          Trip created successfully.
+        </div>
+      ) : null}
 
-            {/* Submit Button */}
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={pending}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-              >
-                {pending?"Creating...":"Create Trip"}
-              </button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+      {/* NOTE: do NOT set method or encType when using a function action — React sets them */}
+      <form action={CreateTrip} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium">Title</label>
+          <input name="title" required className="mt-1 block w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Description</label>
+          <textarea name="description" rows={3} className="mt-1 block w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Image URL (optional)</label>
+          <input name="imageUrl" className="mt-1 block w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Start Date</label>
+          <input name="startDate" type="date" required className="mt-1 block w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">End Date</label>
+          <input name="endDate" type="date" required className="mt-1 block w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <button type="submit" className="w-full px-4 py-2 bg-blue-600 text-white rounded-md">
+            Create Trip
+          </button>
+        </div>
+      </form>
+    </main>
   );
 }

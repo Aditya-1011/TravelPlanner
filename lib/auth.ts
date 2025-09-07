@@ -1,9 +1,8 @@
-// app/lib/auth.ts
+// lib/auth.ts
 import { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./prisma";
- // <-- adjust if your prisma is in a different path
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -14,12 +13,21 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt" }, // keep if you prefer JWT
   callbacks: {
-    async session({ session, user }) {
+    // when user first signs in, put the id in token
+    async jwt({ token, user }) {
+      if (user) {
+        // user is present only at first sign in
+        (token as any).id = (user as any).id;
+      }
+      return token;
+    },
+
+    // whenever a session is checked, copy token.id -> session.user.id
+    async session({ session, token }) {
       if (session.user) {
-        // @ts-expect-error add id to session.user
-        session.user.id = user.id;
+        (session.user as any).id = (token as any).id as string | undefined;
       }
       return session;
     },

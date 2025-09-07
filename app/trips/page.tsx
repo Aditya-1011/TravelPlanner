@@ -23,7 +23,7 @@ export default async function TripsPage() {
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
         <Link href="/trips/new">
         <Button>New Trip</Button>
-        <Button>Yes Trip</Button>
+        
         </Link>
       </div>
     </div>
